@@ -18,26 +18,27 @@ export class SandwichFormComponent implements OnInit {
     { label: 'None sauce', value: Sauce.None },
   ];
 
-  public ingredients =  await this.ingredientsService.getIngredients();
-
+  
+  public ingredients = this.ingredientsService.getIngredients();
   constructor(
     private formBuilder: FormBuilder, 
     private sandwichServer: SandwichService,
     private ingredientsService: IngredientsService,
     ) { }
 
-  public ngOnInit(): void {
-    let ingredientsName = [];
-    let ingredient =   Array.from(this.ingredients);
+    async ngOnInit(): Promise<void>  {
+    let ingredientsList = {}
+    const ddd = await this.ingredients.then(value =>{
+      console.log(value);
+      (<Array<Object>> value).forEach(x =>{
+        ingredientsList[x["name"]] = false
+      })
+    });
+    console.log(ingredientsList);
+    
     this.sandwichForm = this.formBuilder.group({
       name: ['', [Validators.minLength(5), Validators.maxLength(20)]],
-      ingredients: this.formBuilder.group({
-        [Ingredient.name]: false,
-        [Ingredient.Chorizo]: false,
-        [Ingredient.Tomato]: false,
-        [Ingredient.Ham]: false,
-        [Ingredient.Lettuce]: false,
-      }),
+      ingredients: this.formBuilder.group(ingredientsList), 
       sauce: Sauce.Bbq,
       vege: false,
       price: [0, Validators.max(20)]
@@ -48,6 +49,7 @@ export class SandwichFormComponent implements OnInit {
       .filter(ingredient => ingredient[1])
       .map(ingredient => ingredient[0])
   }
+
   public save(): void {
     this.showErrors = true;
     if(this.sandwichForm.valid){
@@ -62,5 +64,7 @@ export class SandwichFormComponent implements OnInit {
       .then(()=> console.log('Kanapka została zapisana'))
       .catch(()=>console.error("Wystapił błąd"));
     }
+
+    
   }
 }

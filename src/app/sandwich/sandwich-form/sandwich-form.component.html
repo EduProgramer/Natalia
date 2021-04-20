@@ -1,5 +1,5 @@
 <h2>Sandiwch builder</h2>
-<form autocomplete="off" novalidate [formGroup]="sandwichForm">
+<form [formGroup]="sandwichForm">
     <fieldset>
         <label>
             Name
@@ -12,8 +12,8 @@
         <label>
             Ingredients
             <ul formGroupName="ingredients">
-                <li *ngFor="let i of sandwichForm.get('ingredients').value | keyvalue">
-                    <input type="checkbox" [formControlName]="i.key" [value]="i.value" >{{i.key}}
+                <li *ngFor="let i of sandwichForm.get('ingredients').value| keyvalue">
+                    <input type="checkbox" [formControlName]="i.key" [value]="i.value" > {{i.key}}
                 </li>
             </ul>
         </label>
