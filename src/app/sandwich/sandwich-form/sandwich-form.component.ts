@@ -18,8 +18,8 @@ export class SandwichFormComponent implements OnInit {
     { label: 'None sauce', value: Sauce.None },
   ];
   
-  ingredients = this.ingredientsService.getIngredients();
-  ingredientsList = {}
+  ingredients;
+  
 
   constructor(
     private formBuilder: FormBuilder, 
@@ -28,17 +28,19 @@ export class SandwichFormComponent implements OnInit {
     ) { }
 
     async ngOnInit(): Promise<void>  {
-    const ddd = await this.ingredients.then(value =>{
-      console.log(value);
-      (<Array<Object>> value).forEach(x =>{
-        this.ingredientsList[x["name"]] = false
-      })
-    });
-    console.log(this.ingredientsList);
     
+    let ingredientsList = [];
+    await this.ingredientsService.getIngredients().then(value =>{
+      this.ingredients = value;
+    });
+
+    this.ingredients.forEach(x =>{
+      ingredientsList[x["name"]] = false
+    })
+
     this.sandwichForm = this.formBuilder.group({
       name: ['', [Validators.minLength(5), Validators.maxLength(20)]],
-      ingredients: this.formBuilder.group(this.ingredientsList), 
+      ingredients: this.formBuilder.group(ingredientsList),
       sauce: Sauce.Bbq,
       vege: false,
       price: [0, Validators.max(20)]
@@ -51,9 +53,20 @@ export class SandwichFormComponent implements OnInit {
   }
 
   updatePrice(ingridient): void{
-    console.log(this.sandwichForm.controls['ingredients'].get(ingridient).value);
+    let addToPrice: Boolean = this.sandwichForm.controls['ingredients'].get(ingridient).value;
 
-    this.sandwichForm.controls['price'].setValue(123);
+    // TODO: trzeba zmienić strukture jsona na bardziej wydajną 
+    let ingridientObject = this.ingredients.filter(x => x.name == ingridient)[0];
+    
+    // TODO: Price nie może być zmiennoprzecinkowy (nie może być float)
+    let currentPrice = this.sandwichForm.controls['price'].value;
+
+    if(addToPrice){
+      this.sandwichForm.controls['price'].setValue(currentPrice + ingridientObject.price);
+      
+    }else{
+      this.sandwichForm.controls['price'].setValue(currentPrice - ingridientObject.price);
+    }
   }
 
   public save(): void {
