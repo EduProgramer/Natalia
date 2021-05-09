@@ -17,9 +17,10 @@ export class SandwichFormComponent implements OnInit {
     { label: 'Mustard sauce', value: Sauce.Mustard },
     { label: 'None sauce', value: Sauce.None },
   ];
-
   
-  public ingredients = this.ingredientsService.getIngredients();
+  ingredients = this.ingredientsService.getIngredients();
+  ingredientsList = {}
+
   constructor(
     private formBuilder: FormBuilder, 
     private sandwichServer: SandwichService,
@@ -27,18 +28,17 @@ export class SandwichFormComponent implements OnInit {
     ) { }
 
     async ngOnInit(): Promise<void>  {
-    let ingredientsList = {}
     const ddd = await this.ingredients.then(value =>{
       console.log(value);
       (<Array<Object>> value).forEach(x =>{
-        ingredientsList[x["name"]] = false
+        this.ingredientsList[x["name"]] = false
       })
     });
-    console.log(ingredientsList);
+    console.log(this.ingredientsList);
     
     this.sandwichForm = this.formBuilder.group({
       name: ['', [Validators.minLength(5), Validators.maxLength(20)]],
-      ingredients: this.formBuilder.group(ingredientsList), 
+      ingredients: this.formBuilder.group(this.ingredientsList), 
       sauce: Sauce.Bbq,
       vege: false,
       price: [0, Validators.max(20)]
@@ -48,6 +48,12 @@ export class SandwichFormComponent implements OnInit {
     return Object.entries(ingredients)
       .filter(ingredient => ingredient[1])
       .map(ingredient => ingredient[0])
+  }
+
+  updatePrice(ingridient): void{
+    console.log(this.sandwichForm.controls['ingredients'].get(ingridient).value);
+
+    this.sandwichForm.controls['price'].setValue(123);
   }
 
   public save(): void {

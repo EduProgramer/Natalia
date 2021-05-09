@@ -14,14 +14,14 @@
         </label>
         <ul formGroupName="ingredients">
             <li *ngFor="let i of sandwichForm.get('ingredients').value| keyvalue">
-                <input type="checkbox" [formControlName]="i.key" [value]="i.value" > {{i.key}}
+                <input (change)="updatePrice(i.key)" type="checkbox" [formControlName]="i.key" [value]="i.value" > {{i.key}}
             </li>
         </ul>
     </fieldset>
     <fieldset>
         <label>Sauce
             <select formControlName="sauce">
-                <option *ngFor="let sauce of sauses" [value]="sauce.value">
+                <option  *ngFor="let sauce of sauses" [value]="sauce.value">
                     {{sauce.label}}
                 </option>
             </select>
